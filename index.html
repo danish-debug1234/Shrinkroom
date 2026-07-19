@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shrinkroom — Compress a photo to any file size</title>
+<meta name="description" content="Drop in a photo, drag to your target file size, download. Free, no upload, works entirely in your browser.">
+
+<!-- ============================================================
+  ADSENSE: paste your AdSense verification snippet here, e.g.
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+============================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    Shrinkroom
+  </div>
+  <p class="tagline">develop a smaller file</p>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Shrink a photo to<br><span class="accent">the size you need.</span></h1>
+    <p class="sub">Drop a JPG or PNG, drag the dial to your target size, download. Nothing leaves your browser.</p>
+  </section>
+
+  <!-- AD SLOT: leaderboard, above the tool -->
+  <div class="ad-slot ad-slot--banner" aria-hidden="true">ad space</div>
+
+  <section class="darkroom">
+
+    <div id="dropzone" class="dropzone">
+      <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" hidden>
+      <div class="dropzone-inner" id="dropzoneInner">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="drop-label">Drop a photo here, or <span class="link-text">choose a file</span></p>
+        <p class="drop-hint">JPG, PNG, or WebP</p>
+      </div>
+      <img id="preview" class="preview-img" hidden>
+    </div>
+
+    <div id="controls" class="controls" hidden>
+
+      <div class="gauge-row">
+        <div class="gauge">
+          <div class="gauge-label">original</div>
+          <div class="gauge-value mono" id="originalSize">—</div>
+        </div>
+        <div class="gauge-arrow">→</div>
+        <div class="gauge gauge--live">
+          <div class="gauge-label">estimated output</div>
+          <div class="gauge-value mono gauge-value--accent" id="outputSize">—</div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-label">reduction</div>
+          <div class="gauge-value mono" id="reductionPct">—</div>
+        </div>
+      </div>
+
+      <label class="slider-label" for="qualitySlider">
+        Quality <span class="mono" id="qualityReadout">80%</span>
+      </label>
+      <input type="range" id="qualitySlider" min="1" max="100" value="80" class="slider">
+
+      <label class="slider-label" for="maxDimSlider">
+        Max dimension <span class="mono" id="maxDimReadout">2000px</span>
+      </label>
+      <input type="range" id="maxDimSlider" min="200" max="4000" step="100" value="2000" class="slider">
+
+      <div class="format-row">
+        <span class="slider-label" style="margin:0;">Output format</span>
+        <div class="format-toggle" id="formatToggle">
+          <button type="button" class="format-btn active" data-format="image/jpeg">JPG</button>
+          <button type="button" class="format-btn" data-format="image/webp">WebP</button>
+          <button type="button" class="format-btn" data-format="image/png">PNG</button>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="downloadBtn" class="btn-primary">Download compressed photo</button>
+        <button id="resetBtn" class="btn-ghost">Start over</button>
+      </div>
+    </div>
+
+    <canvas id="workCanvas" hidden></canvas>
+  </section>
+
+  <!-- AD SLOT: inline rectangle, below the tool -->
+  <div class="ad-slot ad-slot--rect" aria-hidden="true">ad space</div>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <div class="how-grid">
+      <div class="how-item">
+        <span class="how-index mono">01</span>
+        <p>Your photo is decoded straight into a canvas in your browser. It's never sent to a server.</p>
+      </div>
+      <div class="how-item">
+        <span class="how-index mono">02</span>
+        <p>Dragging the quality and dimension dials re-renders the canvas and re-estimates the file size live.</p>
+      </div>
+      <div class="how-item">
+        <span class="how-index mono">03</span>
+        <p>When you download, the browser exports the canvas as a real file at the size shown. That's it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq">
+    <h2>Common questions</h2>
+    <details>
+      <summary>Is my photo uploaded anywhere?</summary>
+      <p>No. Everything happens locally using the HTML canvas API. Nothing is sent to a server, which is also why this tool works offline once the page has loaded.</p>
+    </details>
+    <details>
+      <summary>Why is my output larger than expected?</summary>
+      <p>PNG doesn't support a quality slider the way JPG and WebP do — it only shrinks when you lower the max dimension. For the smallest file at a given quality, use JPG or WebP.</p>
+    </details>
+    <details>
+      <summary>What's a good size for a passport photo or form upload?</summary>
+      <p>Most government and visa forms ask for under 100KB or 200KB. Try quality around 70% and a max dimension of 800–1000px, then adjust the dials until the estimate lands under the limit.</p>
+    </details>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Shrinkroom · a free browser-only tool · built with plain HTML, CSS and JS</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
